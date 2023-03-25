@@ -1,5 +1,5 @@
 use bevy::asset::{Asset, AssetPath, Handle};
-use bevy::reflect::{FromReflect, Reflect, ReflectDeserialize};
+use bevy::reflect::{FromReflect, Reflect, ReflectDeserialize, ReflectSerialize};
 use serde::de::{Error, Visitor};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt::Formatter;

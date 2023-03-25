@@ -70,13 +70,13 @@ fn watch_protos(
     mut commands: Commands,
     query: Query<(Entity, &Foo)>,
     stopwatches: Res<Stopwatches>,
-    mut state: ResMut<State<BenchState>>,
+    mut next_state: ResMut<NextState<BenchState>>,
     mut totals: ResMut<Totals>,
     mut completed: Local<bool>,
 ) {
     if query.is_empty() {
         if *completed {
-            state.set(BenchState::BenchNormal).unwrap();
+            next_state.set(BenchState::BenchNormal);
         }
         return;
     }
@@ -102,7 +102,7 @@ fn spawn_normal(mut commands: Commands, mut stopwatches: ResMut<Stopwatches>) {
     let mut now = Instant::now();
     for _ in 0..BATCH_COUNT {
         for _ in 0..BATCH_SIZE {
-            commands.spawn().insert(Foo {
+            commands.spawn(Foo {
                 name: String::from("Hello World!"),
                 index: 123,
             });
@@ -126,13 +126,13 @@ fn watch_normal(
     mut commands: Commands,
     query: Query<(Entity, &Foo)>,
     stopwatches: Res<Stopwatches>,
-    mut state: ResMut<State<BenchState>>,
+    mut next_state: ResMut<NextState<BenchState>>,
     mut totals: ResMut<Totals>,
     mut completed: Local<bool>,
 ) {
     if query.is_empty() {
         if *completed {
-            state.set(BenchState::BenchProtoComplex).unwrap();
+            next_state.set(BenchState::BenchProtoComplex);
         }
         return;
     }
@@ -185,13 +185,13 @@ fn watch_protos_complex(
     mut commands: Commands,
     query: Query<(Entity, &Foo)>,
     stopwatches: Res<Stopwatches>,
-    mut state: ResMut<State<BenchState>>,
+    mut next_state: ResMut<NextState<BenchState>>,
     mut totals: ResMut<Totals>,
     mut completed: Local<bool>,
 ) {
     if query.is_empty() {
         if *completed {
-            state.set(BenchState::BenchNormalComplex).unwrap();
+            next_state.set(BenchState::BenchNormalComplex);
         }
         return;
     }
@@ -218,12 +218,14 @@ fn spawn_normal_complex(mut commands: Commands, mut stopwatches: ResMut<Stopwatc
     for _ in 0..BATCH_COUNT {
         for _ in 0..BATCH_SIZE {
             commands
-                .spawn()
-                .insert(Foo {
-                    name: String::from("Hello World!"),
-                    index: 123,
-                })
-                .insert(Bar { x: 1.23 })
+                .spawn((
+                    Foo {
+                        name: String::from("Hello World!"),
+                        index: 123,
+                    },
+                    Bar { x: 1.23 },
+                ))
+                // TODO: Should this be a seperate insert still?
                 .insert(Foo {
                     name: String::from("Goodbye!"),
                     index: 123,
@@ -248,13 +250,13 @@ fn watch_normal_complex(
     mut commands: Commands,
     query: Query<(Entity, &Foo)>,
     stopwatches: Res<Stopwatches>,
-    mut state: ResMut<State<BenchState>>,
+    mut next_state: ResMut<NextState<BenchState>>,
     mut totals: ResMut<Totals>,
     mut completed: Local<bool>,
 ) {
     if query.is_empty() {
         if *completed {
-            state.set(BenchState::Done).unwrap();
+            next_state.set(BenchState::Done);
         }
         return;
     }
@@ -283,6 +285,7 @@ fn print_totals(totals: Res<Totals>, mut writer: EventWriter<AppExit>) {
     writer.send(AppExit);
 }
 
+#[derive(Resource)]
 struct Stopwatches {
     proto: Instant,
     normal: Instant,
@@ -301,7 +304,7 @@ impl Default for Stopwatches {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Resource)]
 struct Totals {
     proto: u128,
     normal: u128,
@@ -309,8 +312,9 @@ struct Totals {
     normal_complex: u128,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Default, States)]
 enum BenchState {
+    #[default]
     Load,
     BenchProto,
     BenchNormal,
@@ -337,9 +341,9 @@ fn load_prototype(asset_server: Res<AssetServer>, mut manager: ProtoManager<Prot
     manager.add_multiple_untyped(handles);
 }
 
-fn check_loaded(manager: ProtoManager<Prototype>, mut state: ResMut<State<BenchState>>) {
+fn check_loaded(manager: ProtoManager<Prototype>, mut next_state: ResMut<NextState<BenchState>>) {
     if manager.all_loaded() {
-        state.set(BenchState::BenchProto).unwrap();
+        next_state.set(BenchState::BenchProto);
     }
 }
 
@@ -353,27 +357,19 @@ fn main() {
         .add_plugin(ProtoPlugin::<Prototype>::default())
         .register_type::<Foo>()
         .register_type::<Bar>()
-        .add_state(BenchState::Load)
+        .add_state::<BenchState>()
         .init_resource::<Stopwatches>()
         .init_resource::<Totals>()
-        .add_system_set(SystemSet::on_enter(BenchState::Load).with_system(load_prototype))
-        .add_system_set(SystemSet::on_update(BenchState::Load).with_system(check_loaded))
-        .add_system_set(SystemSet::on_enter(BenchState::BenchProto).with_system(spawn_protos))
-        .add_system_set(SystemSet::on_update(BenchState::BenchProto).with_system(watch_protos))
-        .add_system_set(SystemSet::on_enter(BenchState::BenchNormal).with_system(spawn_normal))
-        .add_system_set(SystemSet::on_update(BenchState::BenchNormal).with_system(watch_normal))
-        .add_system_set(
-            SystemSet::on_enter(BenchState::BenchProtoComplex).with_system(spawn_protos_complex),
-        )
-        .add_system_set(
-            SystemSet::on_update(BenchState::BenchProtoComplex).with_system(watch_protos_complex),
-        )
-        .add_system_set(
-            SystemSet::on_enter(BenchState::BenchNormalComplex).with_system(spawn_normal_complex),
-        )
-        .add_system_set(
-            SystemSet::on_update(BenchState::BenchNormalComplex).with_system(watch_normal_complex),
-        )
-        .add_system_set(SystemSet::on_enter(BenchState::Done).with_system(print_totals))
+        .add_system(load_prototype.in_schedule(OnEnter(BenchState::Load)))
+        .add_system(check_loaded.in_set(OnUpdate(BenchState::Load)))
+        .add_system(spawn_protos.in_schedule(OnEnter(BenchState::BenchProto)))
+        .add_system(watch_protos.in_set(OnUpdate(BenchState::BenchProto)))
+        .add_system(spawn_normal.in_schedule(OnEnter(BenchState::BenchNormal)))
+        .add_system(watch_normal.in_set(OnUpdate(BenchState::BenchNormal)))
+        .add_system(spawn_protos_complex.in_schedule(OnEnter(BenchState::BenchProtoComplex)))
+        .add_system(watch_protos_complex.in_set(OnUpdate(BenchState::BenchProtoComplex)))
+        .add_system(spawn_normal_complex.in_schedule(OnEnter(BenchState::BenchNormalComplex)))
+        .add_system(watch_normal_complex.in_set(OnUpdate(BenchState::BenchNormalComplex)))
+        .add_system(print_totals.in_schedule(OnEnter(BenchState::Done)))
         .run();
 }

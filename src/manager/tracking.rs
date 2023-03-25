@@ -28,8 +28,9 @@ pub(crate) fn track_prototypes<T: Prototypical + Asset>(
                 }
             }
             AssetEvent::Removed { ref handle } => {
-                if handle_to_name.read().contains_key(&handle.id) {
-                    if let Some(name) = handle_to_name.write().remove(&handle.id) {
+                let id = handle.id();
+                if handle_to_name.read().contains_key(&id) {
+                    if let Some(name) = handle_to_name.write().remove(&id) {
                         name_to_handle.write().remove(&name);
                     }
                 }
@@ -44,14 +45,11 @@ fn track<T: Prototypical + Asset>(
     handle_to_name: &HandleToName,
     name_to_handle: &NameToHandle,
 ) {
-    if !handle_to_name.read().contains_key(&handle.id) {
-        handle_to_name
-            .write()
-            .insert(handle.id, proto.name().to_string());
+    let id = handle.id();
+    if !handle_to_name.read().contains_key(&id) {
+        handle_to_name.write().insert(id, proto.name().to_string());
     }
     if !name_to_handle.read().contains_key(proto.name()) {
-        name_to_handle
-            .write()
-            .insert(proto.name().to_string(), handle.id);
+        name_to_handle.write().insert(proto.name().to_string(), id);
     }
 }

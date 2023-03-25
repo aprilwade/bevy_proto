@@ -45,7 +45,7 @@ fn spawn_sprite(
     }
 
     if let Some(proto) = manager.get("Sprite Test") {
-        commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+        commands.spawn(Camera2dBundle::default());
         proto.spawn(&mut commands);
         *has_ran = true;
     }

@@ -1,5 +1,6 @@
 use crate::prelude::{ProtoLoadError, Prototypical};
 use crate::ProtoComponent;
+use bevy::ecs::system::Resource;
 use bevy::utils::HashSet;
 use parking_lot::{RwLock, RwLockReadGuard};
 use std::any::{Any, TypeId};
@@ -15,7 +16,7 @@ pub struct ProtoConfig {
     on_register_component: Option<Arc<dyn Fn(&mut dyn ProtoComponent) -> bool + Send + Sync>>,
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Resource)]
 pub(crate) struct ProtoConfigArc {
     internal: Arc<RwLock<ProtoConfig>>,
 }

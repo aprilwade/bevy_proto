@@ -67,7 +67,7 @@ pub(crate) enum ProtoCompAttr {
     /// Generates the following code:
     /// ```ignore
     /// let bundle: MyBundle = self.clone().into();
-    /// commands.insert_bundle(component);
+    /// commands.insert(component);
     /// ```
     /// # Example
     ///

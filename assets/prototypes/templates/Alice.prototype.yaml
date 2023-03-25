@@ -2,7 +2,4 @@
 name: "Alice"
 template: NPC
 components:
-  - type: "templates::Named"
-    tuple_struct:
-      - type: "alloc::string::String"
-        value: "Alice Allison"
+  - templates::Named: ["Alice Allison"]

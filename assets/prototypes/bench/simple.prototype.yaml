@@ -1,11 +1,6 @@
 ---
 name: "Simple"
 components:
-  - type: bench::Foo
-    struct:
-      name:
-        type: "alloc::string::String"
-        value: "Hello World!"
-      index:
-        type: usize
-        value: 123
+  - bench::Foo:
+      name: "Hello World!"
+      index: 123

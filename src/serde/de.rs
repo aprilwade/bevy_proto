@@ -3,7 +3,7 @@ use crate::config::ProtoConfig;
 use crate::deps::DependencyMap;
 use crate::prelude::{Prototype, TemplateList};
 use crate::serde::extensions::get_default_extension;
-use bevy::reflect::{serde::ReflectDeserializer, TypeRegistry, TypeRegistryArc};
+use bevy::reflect::{serde::UntypedReflectDeserializer, TypeRegistry, TypeRegistryArc};
 use serde::de::value::SeqAccessDeserializer;
 use serde::de::{DeserializeSeed, Error, MapAccess, SeqAccess, Visitor};
 use serde::{Deserialize, Deserializer};
@@ -162,7 +162,7 @@ impl<'a, 'de> Visitor<'de> for ComponentListVisitor<'a> {
     {
         let mut list = Vec::default();
         let registry = self.type_registry.read();
-        while let Some(value) = seq.next_element_seed(ReflectDeserializer::new(&registry))? {
+        while let Some(value) = seq.next_element_seed(UntypedReflectDeserializer::new(&registry))? {
             list.push(value);
         }
         ComponentList::from_reflected(&list, &self.config, &self.type_registry)

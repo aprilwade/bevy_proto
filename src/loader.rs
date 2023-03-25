@@ -5,7 +5,7 @@ use bevy::asset::{
     Asset, AssetLoader, AssetPath, BoxedFuture, Handle, HandleId, HandleUntyped, LoadContext,
     LoadedAsset,
 };
-use bevy::prelude::{FromWorld, World};
+use bevy::prelude::{AppTypeRegistry, FromWorld, World};
 use bevy::reflect::TypeRegistryArc;
 use bevy::utils::HashSet;
 
@@ -26,7 +26,7 @@ pub(crate) struct ProtoAssetLoader<T: Prototypical + ProtoDeserializable + Asset
 
 impl<T: Prototypical + ProtoDeserializable + Asset> FromWorld for ProtoAssetLoader<T> {
     fn from_world(world: &mut World) -> Self {
-        let registry = world.get_resource::<TypeRegistryArc>().unwrap().clone();
+        let registry = world.get_resource::<AppTypeRegistry>().unwrap().clone();
         let config = world.get_resource::<ProtoConfigArc>().unwrap().clone();
         let name_to_handle = world.get_resource::<NameToHandle>().unwrap().clone();
         let handle_to_name = world.get_resource::<HandleToName>().unwrap().clone();
@@ -40,7 +40,7 @@ impl<T: Prototypical + ProtoDeserializable + Asset> FromWorld for ProtoAssetLoad
         exts.push(extensions::RON_EXT);
 
         Self {
-            registry,
+            registry: registry.0,
             config,
             name_to_handle,
             handle_to_name,
@@ -99,10 +99,10 @@ impl<T: Prototypical + ProtoDeserializable + Asset> AssetLoader for ProtoAssetLo
             let handle: Handle<T> = load_context.get_handle(path);
             self.name_to_handle
                 .write()
-                .insert(proto.name().to_string(), handle.id);
+                .insert(proto.name().to_string(), handle.id());
             self.handle_to_name
                 .write()
-                .insert(handle.id, proto.name().to_string());
+                .insert(handle.id(), proto.name().to_string());
             let asset = LoadedAsset::new(proto).with_dependencies(asset_deps);
             load_context.set_default_asset(asset);
             Ok(())

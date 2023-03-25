@@ -1,11 +1,12 @@
 use crate::Prototypical;
 use bevy::asset::{Asset, Handle, HandleId};
+use bevy::ecs::system::Resource;
 use bevy::utils::HashMap;
 use parking_lot::RwLock;
 use std::ops::Deref;
 use std::sync::Arc;
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Resource)]
 pub struct NameToHandle(Arc<RwLock<HashMap<String, HandleId>>>);
 
 impl Deref for NameToHandle {
@@ -16,7 +17,7 @@ impl Deref for NameToHandle {
     }
 }
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Resource)]
 pub struct HandleToName(Arc<RwLock<HashMap<HandleId, String>>>);
 
 impl Deref for HandleToName {
@@ -27,6 +28,7 @@ impl Deref for HandleToName {
     }
 }
 
+#[derive(Resource)]
 pub struct ProtoHandles<T: Asset + Prototypical>(Arc<RwLock<HashMap<HandleId, Handle<T>>>>);
 
 impl<T: Asset + Prototypical> Default for ProtoHandles<T> {

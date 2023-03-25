@@ -24,11 +24,6 @@ impl ProtoComponent for Person {
         // just insert the `Person` component.
         entity.insert(self.clone());
     }
-
-    fn as_reflect(&self) -> &dyn Reflect {
-        // This method allows the internal loader to read this component as a reflected value
-        self
-    }
 }
 
 /// For simple types, deriving [`ProtoComponent`] can be used to automatically
@@ -96,7 +91,7 @@ fn spawn_person(
         proto.spawn(&mut commands);
 
         // Insert on an existing entity!
-        let entity = commands.spawn().id();
+        let entity = commands.spawn_empty().id();
         proto.insert(entity, &mut commands);
     }
 

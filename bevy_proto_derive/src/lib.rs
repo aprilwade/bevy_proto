@@ -18,7 +18,7 @@ mod attributes;
 /// These are attributes that can be applied to the container type.
 ///
 /// * `#[proto_comp(into = "SomeComponent")]`
-///    
+///
 ///   This will convert this `ProtoComponent` into the given component using `.into()`
 ///   when inserting into the entity. The type must be in scope and must implement
 ///   `Component`. This requires that `Clone` also be derived/implemented.
@@ -66,9 +66,6 @@ mod attributes;
 /// //   fn apply(&self, entity: &mut bevy::ecs::world::EntityMut) {
 /// //     entity.insert(self.clone());
 /// //   }
-/// //   fn as_reflect(&self) -> &dyn bevy::prelude::Reflect {
-/// //     self
-/// //   }
 /// //   fn preload_assets(&mut self, preloader: &mut ::bevy_proto::prelude::AssetPreloader) {
 /// //     use ::bevy_proto::prelude::StoreHandle;
 /// //   }
@@ -106,7 +103,7 @@ pub fn proto_comp_derive(input: TokenStream) -> TokenStream {
             ProtoCompAttr::IntoBundle(ty) => Some(quote! {
                 // Convert then insert
                 let bundle: #ty = self.clone().into();
-                #entity_ident.insert_bundle(bundle);
+                #entity_ident.insert(bundle);
             }),
             ProtoCompAttr::With(path) => Some(quote! {
                 // Call function to handle insertion
@@ -136,10 +133,6 @@ pub fn proto_comp_derive(input: TokenStream) -> TokenStream {
         impl #impl_generics #bevy_proto::prelude::ProtoComponent for #ident #ty_generics #where_clause {
             fn apply(&self, #entity_ident: &mut bevy::ecs::world::EntityMut) {
                 #inserter
-            }
-
-            fn as_reflect(&self) -> &dyn bevy::prelude::Reflect {
-                self
             }
 
             fn preload_assets(&mut self, #preloader_ident: &mut #bevy_proto::prelude::AssetPreloader) {

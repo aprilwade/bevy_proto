@@ -42,8 +42,9 @@ fn apply<T: Prototypical + Asset>(id: ProtoId, entity: Entity, world: &mut World
             .unwrap(),
     };
     world.resource_scope(|world, assets: Mut<Assets<T>>| {
+        let handle = assets.get_handle(handle);
         let proto = assets
-            .get(handle)
+            .get(&handle)
             .ok_or_else(|| ProtoSpawnError::NotLoaded { id: id.clone() })
             .unwrap();
         let entity = &mut world

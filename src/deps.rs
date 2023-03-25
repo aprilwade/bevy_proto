@@ -24,7 +24,7 @@ impl DependencyMap {
     /// Panics if the given handle is not _strong_.
     pub fn add_dependency(&mut self, handle: HandleUntyped) -> Option<HandleUntyped> {
         assert!(handle.is_strong(), "Dependency handle must be strong");
-        self.assets.insert(handle.id, handle)
+        self.assets.insert(handle.id(), handle)
     }
 
     /// Add a template dependency.

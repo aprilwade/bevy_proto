@@ -95,36 +95,36 @@ impl From<HandleId> for ProtoId {
 
 impl<'a, T: Asset + Prototypical> From<Handle<T>> for ProtoIdRef<'a> {
     fn from(handle: Handle<T>) -> Self {
-        Self::Handle(handle.id)
+        Self::Handle(handle.id())
     }
 }
 
 impl<'a, T: Asset + Prototypical> From<&'a Handle<T>> for ProtoIdRef<'a> {
     fn from(handle: &'a Handle<T>) -> Self {
-        Self::Handle(handle.id)
+        Self::Handle(handle.id())
     }
 }
 
 impl<T: Asset + Prototypical> From<Handle<T>> for ProtoId {
     fn from(handle: Handle<T>) -> Self {
-        Self::Handle(handle.id)
+        Self::Handle(handle.id())
     }
 }
 
 impl<'a> From<HandleUntyped> for ProtoIdRef<'a> {
     fn from(handle: HandleUntyped) -> Self {
-        Self::Handle(handle.id)
+        Self::Handle(handle.id())
     }
 }
 
 impl<'a> From<&'a HandleUntyped> for ProtoIdRef<'a> {
     fn from(handle: &'a HandleUntyped) -> Self {
-        Self::Handle(handle.id)
+        Self::Handle(handle.id())
     }
 }
 
 impl From<HandleUntyped> for ProtoId {
     fn from(handle: HandleUntyped) -> Self {
-        Self::Handle(handle.id)
+        Self::Handle(handle.id())
     }
 }

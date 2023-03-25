@@ -84,12 +84,6 @@ use bevy::reflect::{FromReflect, FromType};
 ///         entity.insert(self.items.clone());
 ///         entity.insert(self.quest_items.clone());
 ///     }
-///
-///     // This method is required for internal usage. Thankfully, we can just
-///     // return `self` in most cases.
-///     fn as_reflect(&self) -> &dyn Reflect {
-///         self
-///     }
 /// }
 /// ```
 ///
@@ -103,8 +97,6 @@ pub trait ProtoComponent: Reflect + Send + Sync + 'static {
     ///
     /// This includes inserting or removing components and/or bundles.
     fn apply(&self, entity: &mut EntityMut);
-    /// Returns the reflected trait object for this component.
-    fn as_reflect(&self) -> &dyn Reflect;
     /// The [type name] of this component.
     ///
     /// [type name]: std::any::type_name

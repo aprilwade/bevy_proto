@@ -18,7 +18,7 @@ impl ProtoComponent for SpriteBundleDef {
         let asset_server = entity.world().get_resource::<AssetServer>().unwrap();
         let texture = asset_server.load(&self.texture_path);
 
-        entity.insert_bundle(SpriteBundle {
+        entity.insert(SpriteBundle {
             texture,
             ..Default::default()
         });
@@ -31,10 +31,6 @@ impl ProtoComponent for SpriteBundleDef {
         // This will make sure that it is loaded alongside our prototype and will
         // remain loaded at least as long as the prototype.
         let _: Handle<Image> = preloader.preload_dependency(&self.texture_path);
-    }
-
-    fn as_reflect(&self) -> &dyn Reflect {
-        self
     }
 }
 
@@ -53,7 +49,7 @@ fn spawn_sprite(
     }
 
     if let Some(proto) = manager.get("Sprite Test") {
-        commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+        commands.spawn(Camera2dBundle::default());
         proto.spawn(&mut commands);
         *has_ran = true;
     }

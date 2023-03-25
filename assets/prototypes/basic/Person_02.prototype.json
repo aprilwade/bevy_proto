@@ -2,18 +2,13 @@
   "name": "Person Test 2",
   "components": [
     {
-      "type": "basic::Person",
-      "struct": {
+      "basic::Person": {
         "name": "Slim Shady"
       }
     },
     {
-      "type": "basic::Ordered",
-      "struct": {
-        "order": {
-          "type": "i32",
-          "value": 2
-        }
+      "basic::Ordered": {
+        "order": 2
       }
     }
   ]

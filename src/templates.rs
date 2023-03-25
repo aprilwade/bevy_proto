@@ -149,7 +149,8 @@ pub(crate) fn apply_templates<'a, T: Prototypical + Asset>(
             for template_path in templates.iter_inheritance_order() {
                 let asset_path = AssetPath::from(template_path.as_path());
                 let template_handle: HandleId = asset_path.into();
-                let template = assets.get(template_handle).unwrap();
+                let template_handle = assets.get_handle(template_handle);
+                let template = assets.get(&template_handle).unwrap();
                 let result = recurse_templates(assets, TemplateNode(template), stack, func);
                 match result {
                     Err(err) if matches!(err, ProtoSpawnError::CircularDependency { .. }) => {

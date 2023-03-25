@@ -1,6 +1,5 @@
 ---
 name: "Sprite Test"
 components:
-  - type: bundles::SpriteBundleDef
-    struct:
+  - bundles::SpriteBundleDef:
       texture_path: "textures/sprite.png"

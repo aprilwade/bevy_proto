@@ -61,7 +61,7 @@ pub trait Prototypical: 'static + Send + Sync {
     where
         Self: Asset + Sized,
     {
-        let entity = commands.spawn().id();
+        let entity = commands.spawn_empty().id();
         self.insert(entity, commands)
     }
 

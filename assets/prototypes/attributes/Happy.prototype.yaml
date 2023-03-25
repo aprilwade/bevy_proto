@@ -1,8 +1,5 @@
 ---
 name: "Happy"
 components:
-  - type: attributes::EmojiDef
-    struct:
-      emoji:
-        type: alloc::string::String
-        value: 😁
+  - attributes::EmojiDef:
+      emoji: 😁

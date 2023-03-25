@@ -50,7 +50,8 @@ impl<'w, 's, T: Prototypical + Asset> ProtoManager<'w, 's, T> {
             ProtoIdRef::Handle(handle) => handle,
         };
 
-        self.prototypes.contains(handle)
+        let handle = self.prototypes.get_handle(handle);
+        self.prototypes.contains(&handle)
     }
 
     /// Returns true if _all_ stored [prototypical] asset handles are fully loaded.
@@ -99,7 +100,8 @@ impl<'w, 's, T: Prototypical + Asset> ProtoManager<'w, 's, T> {
             ProtoIdRef::Handle(handle) => handle,
         };
 
-        self.prototypes.get(handle)
+        let handle = self.prototypes.get_handle(handle);
+        self.prototypes.get(&handle)
     }
 
     /// Get a _strong_ handle to the [prototypical] asset with the given name.
@@ -146,8 +148,9 @@ impl<'w, 's, T: Prototypical + Asset> ProtoManager<'w, 's, T> {
     /// [`add_multiple`]: Self::add_multiple
     pub fn add(&mut self, handle: Handle<T>) -> Option<Handle<T>> {
         assert!(handle.is_strong(), "The given handle must be strong");
-        if !self.handles.read().contains_key(&handle.id) {
-            self.handles.write().insert(handle.id, handle)
+        let id = handle.id();
+        if !self.handles.read().contains_key(&id) {
+            self.handles.write().insert(id, handle)
         } else {
             None
         }
@@ -163,7 +166,7 @@ impl<'w, 's, T: Prototypical + Asset> ProtoManager<'w, 's, T> {
         let mut writer = self.handles.write();
         for handle in handles {
             assert!(handle.is_strong(), "The given handle must be strong");
-            writer.insert(handle.id, handle);
+            writer.insert(handle.id(), handle);
         }
     }
 
